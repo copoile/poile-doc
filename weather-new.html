@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>天气预报</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/weather.css">
+    <link rel="stylesheet" href="css/swiper.css">
+    <script src="js/adaptive.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/swiper.js"></script>
+    <script src="js/echarts.min.js"></script>
+    <script src="js/getFutrueSevenDays.js"></script>
+    <script type="text/javascript" src="../js/jquery-1.8.0.min.js"></script>
+    <script type="text/javascript" src="../js/common-api.js"></script>
+    <script src="../js/skycons.js"></script>
+    <link rel="stylesheet" href="css/header.css">
+</head>
+<body>
+    <!-- lv-header Start -->
+    <div class="lv-header lv-media-width lv-header-mheight">        
+            <!--Nav_Bg01 bgein-->
+            <div class="Nav_Bg01">
+                <a href="javascript:history.go(-1)" class="back">&nbsp;</a>
+                <div class="title lv-fontsize-20">天气</div>
+                <a href="../index.html" class="pre_page">&nbsp;</a>
+            </div>
+            <!--Nav_Bg01 end-->
+    </div>
+    <div class="weatherBox">
+        <div class="cityName" id="current">
+            <h2>深圳</h2>
+        </div>
+        <div class="title">24小时天气</div>
+        <div class="allDay_T">
+                <div class="swiper-container">
+                   <div class="swiper-wrapper" id="24h">
+
+                    </div>
+                </div>
+        </div>
+    </div>
+    <!-- 未来七天天气预报 -->
+    <div class="futureDays">
+        <div class="title">5内天气预报</div>
+        <div class="date">
+            <ul id="7days">
+<!--                 <li class="weekDataCenter">
+                    <p class="week">星期一</p>
+                    <p class="weekdate">小雨</p>
+                </li> -->
+                
+               
+            </ul>
+
+        </div>
+        <div class="line-wrap">
+            <div id="main" style="width:100%;"></div>
+
+        </div>
+    </div>
+    <iframe class="biframe" src="../include/bottom.html" width="99.1%" height="31%"></iframe>
+    <script type="text/javascript">
+        
+   
+    </script>
+   
+<script type="text/javascript">
+
+var weather24h=[
+    {date:"2019-05-18 23:00",weather:"多云",t:"27.0"},
+    {date:"2019-05-18 23:00",weather:"多云",t:"27.0"},
+    {date:"2019-05-18 22:00",weather:"多云",t:"27.0"},
+    {date:"2019-05-18 21:00",weather:"多云",t:"27.0"},
+    {date:"2019-05-18 20:00",weather:"多云",t:"28.0"},
+    {date:"2019-05-18 19:00",weather:"阵雨",t:"28.0"},
+    {date:"2019-05-18 18:00",weather:"阵雨",t:"30.0"},
+    {date:"2019-05-18 17:00",weather:"阵雨",t:"30.0"},
+    {date:"2019-05-18 15:00",weather:"阵雨",t:"30.0"},
+    {date:"2019-05-18 15:00",weather:"阵雨",t:"31.0"},
+    {date:"2019-05-18 14:00",weather:"阵雨",t:"31.0"},
+    {date:"2019-05-18 13:00",weather:"阵雨",t:"31.0"},
+    {date:"2019-05-18 12:00",weather:"阵雨",t:"31.0"},
+    {date:"2019-05-18 11:00",weather:"多云",t:"30.0"},
+    {date:"2019-05-18 10:00",weather:"多云",t:"29.0"},
+    {date:"2019-05-18 09:00",weather:"多云",t:"29.0"},
+    {date:"2019-05-18 08:00",weather:"多云",t:"28.0"},
+    {date:"2019-05-18 07:00",weather:"多云",t:"27.0"},
+    {date:"2019-05-18 06:00",weather:"多云",t:"27.0"},
+    {date:"2019-05-18 05:00",weather:"多云",t:"27.0"},
+    {date:"2019-05-18 04:00",weather:"多云",t:"27.0"},
+    {date:"2019-05-18 03:00",weather:"中雨",t:"27.0"},
+    {date:"2019-05-18 02:00",weather:"中雨",t:"27.0"},
+    {date:"2019-05-18 01:00",weather:"中雨",t:"27.0"},
+    {date:"2019-05-18 00:00",weather:"多云",t:"27.0"}
+];
+var currentWeather={
+    date:"2019-05-18 23:00",weather:"阵雨",t:"28.0"
+}
+current_build(currentWeather);
+w24h_build(weather24h);
+ // $.ajax({
+    // type: "get",
+    /// url: interface_url+"/weather/getWeather",
+    // data: {"type":"16","city":"shenzhen"},
+    // dataType: 'json',
+     //timeout:3000,
+     //success: function(data){
+       // if(data.isok=="SUCCESS"){
+            //var Highest = new Array();
+                //24h
+                //var weather24h=data.data.weather24h;
+
+ 
+             //   w24h_build(weather24h);
+                /*currentWeather*/
+               // var currentWeather=weather24h[weather24h.length-2];
+           //     current_build(currentWeather);
+                //7day
+         //      var weather15ds=quickSort(data.data.weather15d,"date",false);
+       //        w7days_build(weather15ds);
+     //       }             
+   //     }
+ //   });
+    //深圳气象局15days的用不了，暂时用这个
+    $.ajax({
+     type: "get",
+     url: "http://wthrcdn.etouch.cn/weather_mini?citykey=101280601",
+     dataType: 'json',
+     timeout:3000,
+     success: function(data){
+            w5days_build(data.data.forecast);
+        }             
+    });
+
+
+function w5days_build(data){
+    var max=new Array();
+    var min=new Array();
+    var html="";
+
+ for (var i = 0; i <data.length; i++) {
+    var dateArr=data[i].date.split("日");
+    html+="<li class='weekDataCenter'>";
+    html+="<p class='week'>"+dateArr[1]+"</p>";
+  
+
+    
+    html+="<p class='weekdate'>"+data[i].type+"</p></li>";
+    var low=data[i].low;
+    var lowArr=low.split(" ");
+    var high=data[i].high;
+    var highArr=high.split(" ");
+    var l=lowArr[1].split("℃");
+    var h=highArr[1].split("℃");
+    min.push(l[0]);
+    max.push(h[0]);
+}
+    $("#7days").append(html);
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+    option = {
+        tooltip: {
+            trigger: 'axis'
+        },
+        xAxis:  {
+            type: 'category',
+            boundaryGap: false,
+            // data: ['周一','周二','周三','周四','周五','周六','周日'],
+            show: false ,
+            scale: 1
+        },
+        grid:{
+            top:'15%',//距上边距
+            left:'7%',//距离左边距
+            right:'7%',//距离右边距
+            bottom:'15%',//距离下边距
+        
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                formatter: '{value} °C'
+            },
+            show: false,
+        },
+        series: [
+            {
+                name:'最高气温',
+                type:'line',
+                data:max,
+                symbol:'circle',//拐点样式
+                symbolSize: 8,//拐点大小
+                itemStyle : {
+                    normal : {
+                        color:'#fff',  
+                        lineStyle:{
+                            width:2,//折线宽度
+                            color:"rgba(255,255,255,.3)"//折线颜色
+                        },
+                        label : {
+                            show: true,
+                            // fontSize: 18
+                        }
+                    }
+                }
+            },
+            {
+                name:'最低气温',
+                type:'line',
+                data:min,
+                symbol:'circle',//拐点样式
+                symbolSize: 8,//拐点大小
+                itemStyle : {
+                    normal : {
+                        color:'#fff',  
+                        lineStyle:{
+                            width:2,//折线宽度
+                            color:"rgba(255,255,255,.3)"//折线颜色
+                        },
+                        label : {
+                            show: true,
+                            position:'bottom'
+                            // fontSize: 18
+                        }
+                    }
+                }
+            }
+        ]
+    };
+     // 使用刚指定的配置项和数据显示图表。
+     myChart.setOption(option);
+}
+
+//获取开始下标
+function getCurrentDateIndex(weather15ds){
+    //获取当前时间
+    var index=0;
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var day = date.getDate();
+    if (month < 10) {
+        month = "0" + month;
+    }
+    if (day < 10) {
+        day = "0" + day;
+    }
+        var nowDate = year + "-" + month + "-" + day;
+    for(var i=0;i<weather15ds.length;i++){
+        if(weather15ds[i].date==nowDate){
+            index=i;
+        }
+    }
+return index;
+}
+
+//当前天气
+function w7days_build(weather15ds){
+    var max=new Array();
+    var min=new Array();
+   var index=getCurrentDateIndex(weather15ds);
+    var html="";
+ for (var i = index; i < 7+index; i++) {
+    html+="<li class='weekDataCenter'>";
+    html+="<p class='week'>"+weather15ds[i].week+"</p>";
+    html+="<p class='weekdate'>"+weather15ds[i].dweather+"</p></li>";
+    min.push(weather15ds[i].tmin);
+    max.push(weather15ds[i].tmax);
+}
+    $("#7days").append(html);
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+    option = {
+        tooltip: {
+            trigger: 'axis'
+        },
+        xAxis:  {
+            type: 'category',
+            boundaryGap: false,
+            // data: ['周一','周二','周三','周四','周五','周六','周日'],
+            show: false ,
+            scale: 1
+        },
+        grid:{
+            top:'15%',//距上边距
+            left:'7%',//距离左边距
+            right:'7%',//距离右边距
+            bottom:'15%',//距离下边距
+        
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                formatter: '{value} °C'
+            },
+            show: false,
+        },
+        series: [
+            {
+                name:'最高气温',
+                type:'line',
+                data:max,
+                symbol:'circle',//拐点样式
+                symbolSize: 8,//拐点大小
+                itemStyle : {
+                    normal : {
+                        color:'#fff',  
+                        lineStyle:{
+                            width:2,//折线宽度
+                            color:"rgba(255,255,255,.3)"//折线颜色
+                        },
+                        label : {
+                            show: true,
+                            // fontSize: 18
+                        }
+                    }
+                }
+            },
+            {
+                name:'最低气温',
+                type:'line',
+                data:min,
+                symbol:'circle',//拐点样式
+                symbolSize: 8,//拐点大小
+                itemStyle : {
+                    normal : {
+                        color:'#fff',  
+                        lineStyle:{
+                            width:2,//折线宽度
+                            color:"rgba(255,255,255,.3)"//折线颜色
+                        },
+                        label : {
+                            show: true,
+                            position:'bottom'
+                            // fontSize: 18
+                        }
+                    }
+                }
+            }
+        ]
+    };
+     // 使用刚指定的配置项和数据显示图表。
+     myChart.setOption(option);
+
+}
+
+
+
+
+//当前天气
+function current_build(currentWeather){
+    var html="<div class='current_T clearfix'>";
+    html+="<canvas id='icon' width='70' height='70'> </canvas>";
+    html+="<span class='f_r'>"+currentWeather.weather+"</span>";
+    html+=" </div>";
+    html+="<div class='temperature'>"+currentWeather.t+"<span><i></i>C</span></div>";
+    $("#current").append(html);
+    var skycons = new Skycons({"color": "#f5f5f5"});
+    skycons.add("icon",getcanva(currentWeather.weather));
+    skycons.play();
+
+}
+
+//24h
+function w24h_build(weather24h){
+    var slideHtml = '';
+    var skycons = new Skycons({"color": "#f5f5f5"});
+    for(var i=weather24h.length-1;i>0;i--){
+        var date=weather24h[i].date;
+        var dateArr=date.split(" ");
+        slideHtml += ' <div class="swiper-slide">'+
+                        '<div class="time">'+dateArr[1]+'</div>'+
+                        '<div class="tem_img"><canvas id="icon'+i+'" width="32" height="32"> </canvas></div>'+
+                        '<div class="tem_num">'+weather24h[i].t+'℃</div>'+
+                    '</div>';
+    }
+    $("#24h").html(slideHtml);
+    var swiper = new Swiper('.swiper-container', {
+        slidesPerView: 5,
+        spaceBetween: 38   
+    });
+    for(var i=weather24h.length-1;i>0;i--){
+        skycons.add("icon"+i,getcanva(weather24h[i].weather));
+    }
+}
+
+//根据天气获取相应的画布
+function getcanva(weather){
+    if(weather=="多云"||weather=="阴"){
+       return"partly-cloudy-day";
+    }else if(weather=="晴"){
+        return "clear-day";
+    }else if(weather=="雨"||weather=="小雨"||weather=="中雨"||weather=="大雨"){
+        return "rain";
+   }else{
+      return "partly-cloudy-day";
+  }
+}
+
+//排序
+function quickSort(arr,name,snum){
+if(arr.length<=1){return arr;}
+var pivotIndex=Math.floor(arr.length/2);
+var pivot=arr.splice(pivotIndex,1)[0];
+var middleNum=pivot[name];
+var left=[];
+var right=[];
+if(snum){
+    for(var i=0;i<arr.length;i++){
+        if(Number(arr[i][name])<=Number(middleNum) ){
+            left.push(arr[i]);
+        }else{
+            right.push(arr[i]);
+        }
+    }
+}else{
+    for(var i=0;i<arr.length;i++){
+        if(arr[i][name]<=middleNum){
+            left.push(arr[i]);
+        }else{
+            right.push(arr[i]);
+        }
+    }
+}
+return quickSort(left,name,snum).concat([pivot],quickSort(right,name,snum));
+}
+
+</script>
+<script src="./js/weather.js"></script>
+</body>
+    
+</html>
